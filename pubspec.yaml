@@ -1,0 +1,150 @@
+name: pjbl_backend_mobile_akhirsemestergenap_kelas_x
+description: "A new Flutter project."
+# The following line prevents the package from being accidentally published to
+# pub.dev using `flutter pub publish`. This is preferred for private packages.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at
+# https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.7
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# dependencies can be manually updated by changing the version numbers below to
+# the latest version available on pub.dev. To see which dependencies have newer
+# versions available, run `flutter pub outdated`.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  supabase_flutter: ^2.9.1
+  get: ^4.7.2
+  internet_connection_checker: ^1.0.0+1
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the package is
+  # activated in the `analysis_options.yaml` file located at the root of your
+  # package. See that file for information about deactivating specific lint
+  # rules and activating additional ones.
+  flutter_lints: ^6.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - img/welcome.png
+    - img/logo_wallacea_putih.png
+    - img/logo_wallacea_hitam.png
+    - img/gambar_in_jelajahi.png
+    - img/signin_and_signup.png
+    - img/burung.png
+    - img/ikan.png
+    - img/bunga.png
+    - img/tanaman_buah.png
+    - img/icon_1_page_notifikasi.png
+    - img/icon_2_page_notifikasi.png
+    - img/icon_3_page_notifikasi.png
+    - img/icon_4_page_notifikasi.png
+    - img/icon_peringkat_guest.png
+    - img/icon_silang.png
+    - img/icon_seting.png
+    - img/icon_homepage.png
+    - img/icon_profil.png
+    - img/icon_quit.png
+    - img/icon_mendali_hitam.png
+    - img/icon_tanda_tanya.png
+    - img/icon_notifikasi.png
+    - img/icon_next.png
+    - img/icon_reset.png
+    - img/icon_peringkat.png
+    - img/icon_about.png
+    - img/icon_logout.png
+    - img/icon_mencocokkan.png
+    - img/icon_menebak.png
+    - img/profile_online.png
+    - img/profile_guest.png
+    - img/gambar_easy_page.png
+    - img/gambar_sedang_page.png
+    - img/gambar_sulit_page.png
+    - img/gambar_sangat_sulit_page.png
+    - img/gambar1_leaderboard.png
+    - img/gambar2_leaderboard.png
+    - img/gambar3_leaderboard.png
+    - img/gambar4_leaderboard.png
+    - img/gambar5_leaderboard.png
+    - img/gambar6_leaderboard.png
+    - img/background_leaderboard.png
+    - img/mamalia.png
+    - img/pohon.png
+    - img/reptil.png
+    - img/tanaman_obat.png
+    - img/g1_tanaman_obat.png
+    - img/g2_tanaman_obat.png
+    - img/g3_tanaman_obat.png
+    - img/g1_pohon.png
+    - img/g2_pohon.png
+    - img/g3_pohon.png
+    - img/g1_reptil.png
+    - img/g2_reptil.png
+    - img/g3_reptil.png
+    - img/g1_mamalia.png
+    - img/g2_mamalia.png
+    - img/g3_mamalia.png
+
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/to/resolution-aware-images
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/to/asset-from-package
+
+  # To add custom fonts to your application, add a fonts section here,
+  # in this "flutter" section. Each entry in this list should have a
+  # "family" key with the font family name, and a "fonts" key with a
+  # list giving the asset and other descriptors for the font. For
+  # example:
+  # fonts:
+  #   - family: Schyler
+  #     fonts:
+  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: fonts/Schyler-Italic.ttf
+  #         style: italic
+  #   - family: Trajan Pro
+  #     fonts:
+  #       - asset: fonts/TrajanPro.ttf
+  #       - asset: fonts/TrajanPro_Bold.ttf
+  #         weight: 700
+  #
+  # For details regarding fonts from package dependencies,
+  # see https://flutter.dev/to/font-from-package
