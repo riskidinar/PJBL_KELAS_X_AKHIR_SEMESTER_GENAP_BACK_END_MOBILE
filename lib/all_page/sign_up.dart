@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 // import 'sign_in.dart';
 import 'homepage.dart';
+import 'sign_in.dart';
 
 import '../services/auth_service.dart';
 
@@ -9,23 +10,17 @@ class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
 
   @override
-  State<SignUpPage> createState() =>
-      _SignUpPageState();
+  State<SignUpPage> createState() => _SignUpPageState();
 }
 
-class _SignUpPageState
-    extends State<SignUpPage> {
-
+class _SignUpPageState extends State<SignUpPage> {
   // CONTROLLER
 
-  final usernameController =
-      TextEditingController();
+  final usernameController = TextEditingController();
 
-  final emailController =
-      TextEditingController();
+  final emailController = TextEditingController();
 
-  final passwordController =
-      TextEditingController();
+  final passwordController = TextEditingController();
 
   // AUTH SERVICE
 
@@ -33,22 +28,17 @@ class _SignUpPageState
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: Stack(
         children: [
-
           // BACKGROUND
-
           Container(
             width: double.infinity,
             height: double.infinity,
 
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage(
-                  "img/signin_and_signup.png",
-                ),
+                image: AssetImage("img/signin_and_signup.png"),
 
                 fit: BoxFit.cover,
               ),
@@ -56,83 +46,58 @@ class _SignUpPageState
           ),
 
           // CONTENT
-
           SafeArea(
             child: SingleChildScrollView(
               child: Column(
                 children: [
-
                   const SizedBox(height: 160),
 
                   Container(
-                    margin:
-                        const EdgeInsets.symmetric(
-                      horizontal: 24,
-                    ),
+                    margin: const EdgeInsets.symmetric(horizontal: 24),
 
-                    padding:
-                        const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
 
                     decoration: BoxDecoration(
-                      color:
-                          const Color(0xFF7EB142),
+                      color: const Color(0xFF7EB142),
 
-                      borderRadius:
-                          BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(20),
 
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black
-                              .withOpacity(0.25),
+                          color: Colors.black.withOpacity(0.25),
 
                           blurRadius: 6,
 
-                          offset:
-                              const Offset(0, 4),
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
 
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
 
                       children: [
-
                         // JUDUL
-
                         Padding(
-                          padding:
-                              const EdgeInsets.symmetric(
-                            horizontal: 20,
-                          ),
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
 
                           child: Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment
-                                    .spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
 
                             children: [
-
                               const Expanded(
                                 child: Align(
-                                  alignment:
-                                      Alignment
-                                          .centerLeft,
+                                  alignment: Alignment.centerLeft,
 
                                   child: Text(
                                     "Sign up",
 
-                                    style:
-                                        TextStyle(
-                                      color:
-                                          Colors.white,
+                                    style: TextStyle(
+                                      color: Colors.white,
 
                                       fontSize: 45,
 
-                                      fontWeight:
-                                          FontWeight
-                                              .w800,
+                                      fontWeight: FontWeight.w800,
                                     ),
                                   ),
                                 ),
@@ -149,35 +114,26 @@ class _SignUpPageState
                         const SizedBox(height: 10),
 
                         // USERNAME
-
                         const Text(
                           "Username",
 
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                          ),
+                          style: TextStyle(color: Colors.white, fontSize: 15),
                         ),
 
                         const SizedBox(height: 6),
 
                         _inputBox(
                           hint: "Username anda",
-                          controller:
-                              usernameController,
+                          controller: usernameController,
                         ),
 
                         const SizedBox(height: 12),
 
                         // EMAIL
-
                         const Text(
                           "Email",
 
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                          ),
+                          style: TextStyle(color: Colors.white, fontSize: 15),
                         ),
 
                         const SizedBox(height: 6),
@@ -190,65 +146,112 @@ class _SignUpPageState
                         const SizedBox(height: 12),
 
                         // PASSWORD
-
                         const Text(
                           "Password",
 
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                          ),
+                          style: TextStyle(color: Colors.white, fontSize: 15),
                         ),
 
                         const SizedBox(height: 6),
 
                         _inputBox(
                           hint: "Password",
-                          controller:
-                              passwordController,
+                          controller: passwordController,
                           obscure: true,
                         ),
 
                         const SizedBox(height: 20),
 
                         // BUTTON REGISTER
-
                         Center(
                           child: SizedBox(
                             width: 150,
                             height: 50,
 
                             child: ElevatedButton(
-
                               onPressed: () async {
+                                final username = usernameController.text.trim();
 
-                                final error =
-                                    await authService
-                                        .signUp(
-                                  username:
-                                      usernameController
-                                          .text,
+                                final email = emailController.text.trim();
 
-                                  email:
-                                      emailController
-                                          .text,
+                                final password = passwordController.text.trim();
 
-                                  password:
-                                      passwordController
-                                          .text,
+                                // VALIDASI USERNAME
+
+                                if (username.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Username wajib diisi"),
+                                    ),
+                                  );
+
+                                  return;
+                                }
+
+                                if (username.contains(' ')) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        "Username tidak boleh memakai spasi",
+                                      ),
+                                    ),
+                                  );
+
+                                  return;
+                                }
+
+                                if (username.length < 3) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        "Username minimal 3 karakter",
+                                      ),
+                                    ),
+                                  );
+
+                                  return;
+                                }
+
+                                // VALIDASI EMAIL
+
+                                if (email.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Email wajib diisi"),
+                                    ),
+                                  );
+
+                                  return;
+                                }
+
+                                // VALIDASI PASSWORD
+
+                                if (password.length < 6) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        "Password minimal 6 karakter",
+                                      ),
+                                    ),
+                                  );
+
+                                  return;
+                                }
+
+                                // REGISTER
+
+                                final error = await authService.signUp(
+                                  username: username,
+                                  email: email,
+                                  password: password,
                                 );
 
                                 // BERHASIL
 
                                 if (error == null) {
-
-                                  ScaffoldMessenger.of(
-                                          context)
-                                      .showSnackBar(
+                                  ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text(
-                                        "Register berhasil",
-                                      ),
+                                      content: Text("Register berhasil"),
                                     ),
                                   );
 
@@ -256,41 +259,26 @@ class _SignUpPageState
                                     context,
 
                                     MaterialPageRoute(
-                                      builder: (_) =>
-                                          const HomePage(),
+                                      builder: (_) => const HomePage(),
                                     ),
                                   );
                                 }
-
                                 // GAGAL
-
                                 else {
-
-                                  ScaffoldMessenger.of(
-                                          context)
-                                      .showSnackBar(
-                                    SnackBar(
-                                      content:
-                                          Text(error),
-                                    ),
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(error)),
                                   );
                                 }
                               },
 
-                              style:
-                                  ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color(
-                                  0xFFB9FF66,
-                                ),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFB9FF66),
                               ),
 
                               child: const Text(
                                 "Let’s go!",
 
-                                style: TextStyle(
-                                  color: Colors.black,
-                                ),
+                                style: TextStyle(color: Colors.black),
                               ),
                             ),
                           ),
@@ -299,34 +287,29 @@ class _SignUpPageState
                         const SizedBox(height: 20),
 
                         // KE LOGIN
+                        Center(
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
 
-                        // Center(
-                        //   child: GestureDetector(
-
-                        //     onTap: () {
-
-                        //       Navigator.push(
-                        //         context,
-
-                        //         MaterialPageRoute(
-                        //           builder: (_) =>
-                        //               const SignInPage(),
-                        //         ),
-                        //       );
-                        //     },
-
-                        //     child: const Text(
-                        //       "Sudah punya akun? Login",
-
-                        //       style: TextStyle(
-                        //         color: Colors.white,
-                        //         decoration:
-                        //             TextDecoration
-                        //                 .underline,
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const SignInPage(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              "Sudah punya akun? Login",
+                              style: TextStyle(
+                                color: Colors.white,
+                                decoration:
+                                    TextDecoration
+                                        .underline,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -338,48 +321,30 @@ class _SignUpPageState
       ),
     );
   }
-
   // INPUT BOX
 
   Widget _inputBox({
     required String hint,
-    required TextEditingController
-        controller,
+    required TextEditingController controller,
     bool obscure = false,
   }) {
-
     return Container(
       width: 330,
       height: 45,
-
       decoration: BoxDecoration(
         color: const Color(0xFF7EB142),
-
-        borderRadius:
-            BorderRadius.circular(15),
-
-        border: Border.all(
-          color: Colors.black,
-          width: 2,
-        ),
+        borderRadius: BorderRadius.circular(15),
+        border: Border.all(color: Colors.black, width: 2),
       ),
-
       child: TextField(
         controller: controller,
         obscureText: obscure,
-
         decoration: InputDecoration(
           hintText: hint,
-
-          hintStyle:
-              const TextStyle(
-            color: Colors.white,
-          ),
+          hintStyle: const TextStyle(color: Colors.white),
 
           border: InputBorder.none,
-
-          contentPadding:
-              const EdgeInsets.symmetric(
+          contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 10,
           ),

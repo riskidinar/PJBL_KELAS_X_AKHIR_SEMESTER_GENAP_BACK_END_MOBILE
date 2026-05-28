@@ -2,7 +2,13 @@ import 'package:flutter/material.dart';
 import 'level_mudah.dart';
 
 class LosePageMudah extends StatelessWidget {
-  const LosePageMudah({super.key});
+
+  final int skor;
+  const LosePageMudah({
+    super.key,
+    required this.skor,
+  });
+
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +44,52 @@ class LosePageMudah extends StatelessWidget {
                 ),
               ),
             ),
+            
+            const SizedBox(height: 25),
 
-            const SizedBox(height: 24),
+            // Box Score
+             Container(
+              padding: const EdgeInsets.symmetric(horizontal: 75, vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF3E7B27),
+                borderRadius: BorderRadius.circular(14),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.9),
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+
+              child: Column(
+                children: [
+                  const SizedBox(height: 5),
+                  const Text(
+                    "Total Skor Level ini",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    "$skor",
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 60,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+
+                  const SizedBox(height: 22),
+
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 25),
 
             // all tombol
             Row(

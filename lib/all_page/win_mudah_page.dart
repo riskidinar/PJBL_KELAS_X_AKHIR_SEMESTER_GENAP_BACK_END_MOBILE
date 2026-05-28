@@ -3,7 +3,9 @@ import 'level_mudah.dart';
 import 'level_sedang.dart';
 
 class WinPageMudah extends StatelessWidget {
-  const WinPageMudah({super.key});
+  final int skor;
+
+  const WinPageMudah({super.key, required this.skor});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +15,8 @@ class WinPageMudah extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // box Teks
+
+            // BOX MENANG
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 115,
@@ -38,11 +41,9 @@ class WinPageMudah extends StatelessWidget {
 
             const SizedBox(height: 25),
 
+            // BOX SKOR
             Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 75,
-                vertical: 12,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 75, vertical: 12),
               decoration: BoxDecoration(
                 color: const Color(0xFF3E7B27),
                 borderRadius: BorderRadius.circular(14),
@@ -56,9 +57,10 @@ class WinPageMudah extends StatelessWidget {
               ),
 
               child: Column(
-                children: const [
-                  SizedBox(height: 5),
-                  Text(
+                children: [
+                  const SizedBox(height: 5),
+
+                  const Text(
                     "Total Skor Level ini",
                     style: TextStyle(
                       color: Colors.white,
@@ -66,25 +68,25 @@ class WinPageMudah extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-
-                  SizedBox(height: 10),
-
+                  const SizedBox(height: 10),
                   Text(
-                    "271", // contoh skor yang nanti bisa di ubah sistem
-                    style: TextStyle(
+                    "$skor",
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 60,
                       fontWeight: FontWeight.w900,
                     ),
                   ),
-                  SizedBox(height: 22),
+
+                  const SizedBox(height: 22),
+
                 ],
               ),
             ),
 
             const SizedBox(height: 25),
 
-            // all tombol
+            // TOMBOL
             Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -131,6 +133,7 @@ class WinPageMudah extends StatelessWidget {
                       horizontal: 20,
                       vertical: 10,
                     ),
+
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -143,6 +146,7 @@ class WinPageMudah extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushReplacement(
                       context,
+
                       MaterialPageRoute(builder: (_) => LevelSedangPage()),
                     );
                   },
