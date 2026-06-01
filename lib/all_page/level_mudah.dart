@@ -71,11 +71,9 @@ class _LevelMudahPageState extends State<LevelMudahPage> {
   // HITUNG SKOR MENANG
   int hitungSkorMenang() {
     final durasi = DateTime.now().difference(waktuMulai);
-
     final detik = durasi.inSeconds;
 
     // semakin cepat semakin besar
-
     if (detik <= 5) {
       return 100;
     } else if (detik <= 10) {

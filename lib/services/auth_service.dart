@@ -79,7 +79,7 @@ class AuthService {
   }
 
   // GET USER
-  User? getCurrentUser(){
+  User? getCurrentUser() {
     return supabase.auth.currentUser;
   }
 }

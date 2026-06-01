@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'win_sulit_page.dart';
 import 'lose_sulit_page.dart';
 import 'setting.dart';
@@ -27,55 +28,144 @@ class _LevelSulitPageState extends State<LevelSulitPage> {
   int jumlahBenar = 0;
   late int sisaKesempatan;
 
+  // TIMER
+  late DateTime waktuMulai;
+
+  // SUPABASE
+  final supabase = Supabase.instance.client;
+
   @override
   void initState() {
     super.initState();
+
     sisaKesempatan = maxKesempatan;
+
+    // mulai hitung waktu
+    waktuMulai = DateTime.now();
+
     setupGame();
   }
 
+  // SETUP GAME
   void setupGame() {
     kartuTerbuka = List.generate(totalKartu, (_) => false);
+
     kartuBenar = List.generate(totalKartu, (_) => false);
 
     final random = Random();
     final indexAcak = <int>{};
-
     while (indexAcak.length < targetBenar) {
       indexAcak.add(random.nextInt(totalKartu));
     }
 
+    // kartu benar
     for (var i in indexAcak) {
       kartuBenar[i] = true;
     }
 
+    // buka 1 kartu otomatis
     final indexAwal = indexAcak.first;
+
     kartuTerbuka[indexAwal] = true;
   }
 
+  // HITUNG SKOR MENANG
+  int hitungSkorMenang() {
+    final durasi = DateTime.now().difference(waktuMulai);
+    final detik = durasi.inSeconds;
+
+    // semakin cepat semakin besar
+    if (detik <= 5) {
+      return 100;
+    } else if (detik <= 10) {
+      return 80;
+    } else if (detik <= 15) {
+      return 60;
+    } else if (detik <= 20) {
+      return 40;
+    } else {
+      return 20;
+    }
+  }
+
+  // HITUNG SKOR KALAH
+  int hitungSkorKalah() {
+    final random = Random();
+
+    // random 6 - 9
+    return 6 + random.nextInt(4);
+  }
+
+  // SIMPAN SKOR KE DATABASE
+  Future<void> simpanSkor(int skorBaru) async {
+    try {
+      final user = supabase.auth.currentUser;
+
+      if (user == null) return;
+
+      // ambil total skor lama
+      final data = await supabase
+          .from('profiles')
+          .select('total_score')
+          .eq('id', user.id)
+          .single();
+
+      final totalLama = data['total_score'] ?? 0;
+      final totalBaru = totalLama + skorBaru;
+
+      // update total score
+      await supabase
+          .from('profiles')
+          .update({
+            'total_score': totalBaru,
+            'updated_at': DateTime.now().toIso8601String(),
+          })
+          .eq('id', user.id);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  // KETIKA KARTU DI KLIK
   void onKartuTap(int index) {
     if (kartuTerbuka[index]) return;
 
     setState(() {
       kartuTerbuka[index] = true;
 
+      // JIKA BENAR
       if (kartuBenar[index]) {
         jumlahBenar++;
+
+        // MENANG
         if (jumlahBenar == targetBenar - 1) {
+          final skor = hitungSkorMenang();
+
+          simpanSkor(skor);
+
           Future.delayed(const Duration(seconds: 0), () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (_) => WinPageSulit()),
+
+              MaterialPageRoute(builder: (_) => WinPageSulit(skor: skor)),
             );
           });
         }
-      } else {
+      }
+      // JIKA SALAH
+      else {
         sisaKesempatan--;
+
+        // KALAH
         if (sisaKesempatan == 0) {
+          final skor = hitungSkorKalah();
+
+          simpanSkor(skor);
+
           Future.delayed(const Duration(seconds: 0), () {
             Navigator.pushReplacement(
               context,
-              MaterialPageRoute(builder: (_) => const LosePageSulit()),
+              MaterialPageRoute(builder: (_) => LosePageSulit(skor: skor)),
             );
           });
         }

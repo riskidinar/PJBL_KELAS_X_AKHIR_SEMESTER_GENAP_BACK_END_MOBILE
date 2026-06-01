@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 import 'selesai_mencocokkan.dart';
 import 'setting.dart';
@@ -14,25 +15,27 @@ class MencocokkanMamaliaPage extends StatefulWidget {
 }
 
 class _MencocokkanMamaliaPageState extends State<MencocokkanMamaliaPage> {
+  
+  // stopwatch atau timer
+  late Stopwatch stopwatch;
+
   final List<String> correctOrder = ["Anoa", "Kalong", "Kuskus"];
-
   late List<String> draggableItems;
-
   Map<String, String?> placed = {};
   String? wrongTarget;
 
   @override
   void initState() {
     super.initState();
+    stopwatch = Stopwatch();
+    stopwatch.start();
     startGame();
   }
 
   void startGame() {
     draggableItems = List.from(correctOrder);
     draggableItems.shuffle(Random());
-
     placed = {"Anoa": null, "Kalong": null, "Kuskus": null};
-
     wrongTarget = null;
   }
 
@@ -40,12 +43,15 @@ class _MencocokkanMamaliaPageState extends State<MencocokkanMamaliaPage> {
     return placed.values.every((e) => e != null);
   }
 
-  void checkFinish() {
+  void checkFinish() async {
     if (isFinished()) {
+      stopwatch.stop();
+      int finalScore = calculateScore();
+      await saveScore(finalScore);
       Future.delayed(const Duration(milliseconds: 500), () {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => GameSelesaiPage()),
+          MaterialPageRoute(builder: (_) => GameSelesaiPage(score: finalScore,)),
         );
       });
     }
@@ -55,12 +61,50 @@ class _MencocokkanMamaliaPageState extends State<MencocokkanMamaliaPage> {
     setState(() {
       wrongTarget = targetName;
     });
-
     Future.delayed(const Duration(milliseconds: 400), () {
       setState(() {
         wrongTarget = null;
       });
     });
+  }
+
+  int calculateScore() {
+    final seconds = stopwatch.elapsed.inSeconds;
+
+    if (seconds <= 10) {
+      return 100;
+    } else if (seconds <= 20) {
+      return 80;
+    } else if (seconds <= 30) {
+      return 60;
+    } else {
+      return 40;
+    }
+  }
+
+  final supabase = Supabase.instance.client;
+
+  Future<void> saveScore(int score) async {
+    try {
+      final user = supabase.auth.currentUser;
+      if (user == null) return;
+
+      // ambil skor lama
+      final data = await supabase
+          .from('profiles')
+          .select('total_score')
+          .eq('id', user.id)
+          .single();
+      int currentScore = data['total_score'] ?? 0;
+
+      // update skor baru
+      await supabase
+          .from('profiles')
+          .update({'total_score': currentScore + score})
+          .eq('id', user.id);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   @override
@@ -72,7 +116,6 @@ class _MencocokkanMamaliaPageState extends State<MencocokkanMamaliaPage> {
         toolbarHeight: 50,
         backgroundColor: Colors.white,
       ),
-
       body: SafeArea(
         child: Column(
           children: [
@@ -138,7 +181,6 @@ class _MencocokkanMamaliaPageState extends State<MencocokkanMamaliaPage> {
                         fit: BoxFit.cover,
                       ),
                     ),
-
                     Expanded(
                       child: Image.asset(
                         "img/g2_mamalia.png",
@@ -176,7 +218,6 @@ class _MencocokkanMamaliaPageState extends State<MencocokkanMamaliaPage> {
                   padding: const EdgeInsets.symmetric(
                     horizontal: 18, // jarak antar kotak
                   ),
-
                   child: DragTarget<String>(
                     onAccept: (data) {
                       if (data == targetName) {
@@ -190,25 +231,18 @@ class _MencocokkanMamaliaPageState extends State<MencocokkanMamaliaPage> {
                         showWrongEffect(targetName);
                       }
                     },
-
                     builder: (context, candidateData, rejectedData) {
                       return AnimatedContainer(
                         duration: const Duration(milliseconds: 200),
-
                         width: 95, // lebar kotak
                         height: 35, // tinggi kotak
-
                         alignment: Alignment.center,
-
                         decoration: BoxDecoration(
                           color: wrongTarget == targetName
                               ? Colors.red
                               : const Color(0xFFD9D9D9),
-
                           borderRadius: BorderRadius.circular(4),
-
                           border: Border.all(color: Colors.black26),
-
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black26,
@@ -217,9 +251,9 @@ class _MencocokkanMamaliaPageState extends State<MencocokkanMamaliaPage> {
                             ),
                           ],
                         ),
-
                         child: Text(
-                          placed[targetName] ?? "Pilih Jawabanmu", // tulisan default
+                          placed[targetName] ??
+                              "Pilih Jawabanmu", // tulisan default
                           style: const TextStyle(
                             fontSize: 8,
                             fontFamily: 'Poppins',
@@ -238,15 +272,12 @@ class _MencocokkanMamaliaPageState extends State<MencocokkanMamaliaPage> {
             // ===== TEXT =====
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 30),
-
               child: Text(
                 "Cocokan tulisan Di bawah ini\n"
                 "Berdasarkan gambar di atas dengan\n"
                 "cara di Drag ke kotak yang telah\n"
                 "disediakan.",
-
                 textAlign: TextAlign.center,
-
                 style: TextStyle(
                   fontSize: 20,
                   fontFamily: 'Poppins',
@@ -276,29 +307,21 @@ class _MencocokkanMamaliaPageState extends State<MencocokkanMamaliaPage> {
 
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-
                 children: draggableItems.map((name) {
                   return Draggable<String>(
                     data: name,
-
                     feedback: Material(
                       color: Colors.transparent,
-
                       child: Container(
                         width: 95,
                         height: 35,
-
                         alignment: Alignment.center,
-
                         decoration: BoxDecoration(
                           color: const Color(0xFF8DBB45),
-
                           borderRadius: BorderRadius.circular(4),
                         ),
-
                         child: Text(
                           name,
-
                           style: const TextStyle(
                             fontSize: 10,
                             fontFamily: 'Poppins',
@@ -307,20 +330,14 @@ class _MencocokkanMamaliaPageState extends State<MencocokkanMamaliaPage> {
                         ),
                       ),
                     ),
-
                     childWhenDragging: const SizedBox(width: 90, height: 150),
-
                     child: Container(
                       width: 95,
                       height: 35,
-
                       alignment: Alignment.center,
-
                       decoration: BoxDecoration(
                         color: const Color(0xFF8DBB45),
-
                         borderRadius: BorderRadius.circular(4),
-
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black26,
@@ -329,10 +346,8 @@ class _MencocokkanMamaliaPageState extends State<MencocokkanMamaliaPage> {
                           ),
                         ],
                       ),
-
                       child: Text(
                         name,
-
                         style: const TextStyle(
                           fontSize: 15,
                           fontFamily: 'Poppins',

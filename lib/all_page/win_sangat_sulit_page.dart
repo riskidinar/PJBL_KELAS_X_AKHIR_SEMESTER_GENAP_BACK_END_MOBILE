@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'level_sangat_sulit.dart';
 
-class WinPageSangatSulit extends StatelessWidget {
-  const WinPageSangatSulit({super.key});
+class WinSangatSulitPage extends StatelessWidget {
+
+  final int skor;
+  const WinSangatSulitPage({
+    super.key,
+    required this.skor,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +61,7 @@ class WinPageSangatSulit extends StatelessWidget {
               ),
 
               child: Column(
-                children: const [
+                children: [
                   SizedBox(height: 5),
                   Text(
                     "Total Skor Level ini",
@@ -70,7 +75,7 @@ class WinPageSangatSulit extends StatelessWidget {
                   SizedBox(height: 10),
 
                   Text(
-                    "271", // contoh skor yang nanti bisa di ubah sistem
+                    "$skor", // contoh skor yang nanti bisa di ubah sistem
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 60,

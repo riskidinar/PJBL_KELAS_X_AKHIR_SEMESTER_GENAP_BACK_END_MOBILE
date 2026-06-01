@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
 import 'selesai_mencocokkan.dart';
 import 'setting.dart';
@@ -14,6 +15,8 @@ class MencocokkanTanamanPage extends StatefulWidget {
 }
 
 class _MencocokkanTanamanPageState extends State<MencocokkanTanamanPage> {
+  // stopwatch
+  late Stopwatch stopwatch;
 
   final List<String> correctOrder = ["Mengkudu", "Jahe", "Daun Sirih"];
   late List<String> draggableItems;
@@ -24,6 +27,8 @@ class _MencocokkanTanamanPageState extends State<MencocokkanTanamanPage> {
   @override
   void initState() {
     super.initState();
+    stopwatch = Stopwatch();
+    stopwatch.start();
     startGame();
   }
 
@@ -31,11 +36,7 @@ class _MencocokkanTanamanPageState extends State<MencocokkanTanamanPage> {
     draggableItems = List.from(correctOrder);
     draggableItems.shuffle(Random());
 
-    placed = {
-      "Mengkudu": null,
-      "Jahe": null,
-      "Daun Sirih": null,
-    };
+    placed = {"Mengkudu": null, "Jahe": null, "Daun Sirih": null};
 
     wrongTarget = null;
   }
@@ -46,11 +47,12 @@ class _MencocokkanTanamanPageState extends State<MencocokkanTanamanPage> {
 
   void checkFinish() {
     if (isFinished()) {
+      stopwatch.stop();
+      int finalScore = calculateScore();
       Future.delayed(const Duration(milliseconds: 500), () {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-              builder: (_) => GameSelesaiPage()),
+          MaterialPageRoute(builder: (_) => GameSelesaiPage(score: finalScore,)),
         );
       });
     }
@@ -66,6 +68,45 @@ class _MencocokkanTanamanPageState extends State<MencocokkanTanamanPage> {
         wrongTarget = null;
       });
     });
+  }
+
+  int calculateScore() {
+    final seconds = stopwatch.elapsed.inSeconds;
+
+    if (seconds <= 10) {
+      return 100;
+    } else if (seconds <= 20) {
+      return 80;
+    } else if (seconds <= 30) {
+      return 60;
+    } else {
+      return 40;
+    }
+  }
+
+  final supabase = Supabase.instance.client;
+
+  Future<void> saveScore(int score) async {
+    try {
+      final user = supabase.auth.currentUser;
+      if (user == null) return;
+
+      // ambil skor lama
+      final data = await supabase
+          .from('profiles')
+          .select('total_score')
+          .eq('id', user.id)
+          .single();
+      int currentScore = data['total_score'] ?? 0;
+
+      // update skor baru
+      await supabase
+          .from('profiles')
+          .update({'total_score': currentScore + score})
+          .eq('id', user.id);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   @override
@@ -224,7 +265,8 @@ class _MencocokkanTanamanPageState extends State<MencocokkanTanamanPage> {
                         ),
 
                         child: Text(
-                          placed[targetName] ?? "Pilih Jawabanmu", // tulisan default
+                          placed[targetName] ??
+                              "Pilih Jawabanmu", // tulisan default
                           style: const TextStyle(
                             fontSize: 8,
                             fontFamily: 'Poppins',

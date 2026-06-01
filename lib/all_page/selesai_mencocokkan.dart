@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';
 import 'cocokkan_kata.dart';
 import 'homepage.dart';
 
-void main() {
-  runApp(GameSelesaiPage());
-}
+
 
 class GameSelesaiPage extends StatelessWidget {
-  const GameSelesaiPage({super.key});
+  final int score;
+
+  const GameSelesaiPage({
+    super.key,
+    required this.score,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +59,7 @@ class GameSelesaiPage extends StatelessWidget {
               ),
 
               child: Column(
-                children: const [
+                children: [
                   SizedBox(height: 5),
                   Text(
                     "Total Skor Level ini",
@@ -70,7 +73,7 @@ class GameSelesaiPage extends StatelessWidget {
                   SizedBox(height: 10),
 
                   Text(
-                    "404", // contoh skor yang nanti bisa di ubah sistem
+                    "$score", // contoh skor yang nanti bisa di ubah sistem
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 60,

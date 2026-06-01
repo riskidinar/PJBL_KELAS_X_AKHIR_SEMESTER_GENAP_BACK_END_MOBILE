@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:pjbl_backend_mobile_akhirsemestergenap_kelas_x/all_page/sign_in.dart';
+// import 'package:pjbl_backend_mobile_akhirsemestergenap_kelas_x/all_page/sign_in.dart';
 
 // ganti dengan halaman tujuan
 // import 'homepage.dart';
@@ -124,38 +124,38 @@ class DeteksiOffline extends StatelessWidget {
                           child: SizedBox(
                             width: 150,
                             height: 50,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const SignInPage(),
-                                  ),
-                                );
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFB9FF66),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(18),
-                                    topRight: Radius.circular(20),
-                                    bottomLeft: Radius.circular(20),
-                                    bottomRight: Radius.circular(18),
-                                  ),
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 12,
-                                ),
-                              ),
-                              child: const Text(
-                                "Kembali",
-                                style: TextStyle(
-                                  color: Colors.black, // ganti warna di sini
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                            // child: ElevatedButton(
+                            //   onPressed: () {
+                            //     Navigator.pushReplacement(
+                            //       context,
+                            //       MaterialPageRoute(
+                            //         builder: (_) => const SignInPage(),
+                            //       ),
+                            //     );
+                            //   },
+                            //   style: ElevatedButton.styleFrom(
+                            //     backgroundColor: const Color(0xFFB9FF66),
+                            //     shape: RoundedRectangleBorder(
+                            //       borderRadius: BorderRadius.only(
+                            //         topLeft: Radius.circular(18),
+                            //         topRight: Radius.circular(20),
+                            //         bottomLeft: Radius.circular(20),
+                            //         bottomRight: Radius.circular(18),
+                            //       ),
+                            //     ),
+                            //     padding: const EdgeInsets.symmetric(
+                            //       vertical: 12,
+                            //     ),
+                            //   ),
+                            //   child: const Text(
+                            //     "Kembali",
+                            //     style: TextStyle(
+                            //       color: Colors.black, // ganti warna di sini
+                            //       fontSize: 16,
+                            //       fontWeight: FontWeight.bold,
+                            //     ),
+                            //   ),
+                            // ),
                           ),
                         ),
 

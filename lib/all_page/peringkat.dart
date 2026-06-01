@@ -19,6 +19,7 @@ class _PapanPeringkatPageState extends State<PapanPeringkatPage> {
     super.initState();
     ambilLeaderboard();
   }
+
   Future<void> ambilLeaderboard() async {
     final data = await supabase
         .from('profiles')
@@ -33,7 +34,6 @@ class _PapanPeringkatPageState extends State<PapanPeringkatPage> {
       final index = players.indexWhere((item) => item['id'] == user.id);
       if (index != -1) {
         currentUserRank = index + 1;
-
         currentUserData = players[index];
       }
     }
@@ -71,11 +71,11 @@ class _PapanPeringkatPageState extends State<PapanPeringkatPage> {
                 itemCount: players.length,
                 itemBuilder: (context, index) {
                   final p = players[index];
-
                   return PapanPeringkatItem(
                     rank: index + 1,
                     nama: p['username'] ?? '-',
                     skor: p['total_score'] ?? 0,
+                    avatarUrl: p['avatar_url'],
                   );
                 },
               ),
@@ -104,6 +104,7 @@ class _PapanPeringkatPageState extends State<PapanPeringkatPage> {
                   rank: currentUserRank,
                   nama: currentUserData!['username'],
                   skor: currentUserData!['total_score'],
+                  avatarUrl: currentUserData!['avatar_url'],
                 ),
               ),
             ),
@@ -115,18 +116,21 @@ class PapanPeringkatItem extends StatelessWidget {
   final int rank;
   final String nama;
   final int skor;
+  final String? avatarUrl;
 
   const PapanPeringkatItem({
     super.key,
     required this.rank,
     required this.nama,
     required this.skor,
+    this.avatarUrl,
   });
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     return Container(
+      margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.symmetric(horizontal: 12),
       height: 70,
       decoration: BoxDecoration(
@@ -137,8 +141,11 @@ class PapanPeringkatItem extends StatelessWidget {
         children: [
           Text('$rank', style: const TextStyle(fontWeight: FontWeight.w600)),
           const SizedBox(width: 15),
-          const CircleAvatar(
-            backgroundImage: AssetImage('img/default_profile.png'),
+          CircleAvatar(
+            radius: 22,
+            backgroundImage: avatarUrl != null && avatarUrl!.isNotEmpty
+                ? NetworkImage(avatarUrl!)
+                : const AssetImage('img/default_profile.png') as ImageProvider,
           ),
           const SizedBox(width: 25),
           Expanded(child: Text(nama, style: textTheme.bodyMedium)),

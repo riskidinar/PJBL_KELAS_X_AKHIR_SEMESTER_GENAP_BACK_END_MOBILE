@@ -1,15 +1,52 @@
 import 'package:flutter/material.dart';
-
-
-
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'notifikasi.dart';
 import 'menebak_gambar.dart';
 import 'cocokkan_kata.dart';
 import 'profil.dart';
 import 'setting.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final supabase = Supabase.instance.client;
+
+  String? avatarUrl;
+  String username = "Pemain";
+
+  @override
+  void initState() {
+    super.initState();
+    getProfile();
+  }
+
+  Future<void> getProfile() async {
+    try {
+      final user = supabase.auth.currentUser;
+
+      if (user == null) return;
+
+      final data = await supabase
+          .from('profiles')
+          .select('username, avatar_url')
+          .eq('id', user.id)
+          .single();
+
+      debugPrint("DATA PROFILE = $data");
+
+      setState(() {
+        username = data['username'] ?? "Pemain";
+        avatarUrl = data['avatar_url'];
+      });
+    } catch (e) {
+      debugPrint("ERROR: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,26 +56,22 @@ class HomePage extends StatelessWidget {
       // ================= BODY =================
       body: Column(
         children: [
-
           // ===== HEADER =====
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
-            decoration: const BoxDecoration(
-              color: Color(0xFF8DBA43),
-            ),
+            decoration: const BoxDecoration(color: Color(0xFF8DBA43)),
             child: SafeArea(
               bottom: false,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-
                   // teks kiri
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
+                    children: [
                       Text(
-                        "Halo!",
-                        style: TextStyle(
+                        "Halo, $username!",
+                        style: const TextStyle(
                           color: Colors.white,
                           fontSize: 30,
                           fontWeight: FontWeight.w900,
@@ -47,10 +80,7 @@ class HomePage extends StatelessWidget {
                       SizedBox(height: 4),
                       Text(
                         "Apa yang ingin kamu mainkan ?",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 15,
-                        ),
+                        style: TextStyle(color: Colors.white, fontSize: 15),
                       ),
                     ],
                   ),
@@ -58,7 +88,26 @@ class HomePage extends StatelessWidget {
                   // avatar
                   CircleAvatar(
                     radius: 45,
-                    backgroundImage: AssetImage("img/profile_online.png",),
+                    backgroundColor: Colors.white,
+                    child: ClipOval(
+                      child: avatarUrl != null && avatarUrl!.isNotEmpty
+                          ? Image.network(
+                              avatarUrl!,
+                              width: 90,
+                              height: 90,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) {
+                                return Image.asset(
+                                  "img/icon_profil.png",
+                                  fit: BoxFit.cover,
+                                );
+                              },
+                            )
+                          : Image.asset(
+                              "img/icon_profil.png",
+                              fit: BoxFit.cover,
+                            ),
+                    ),
                   ),
                 ],
               ),
@@ -77,10 +126,7 @@ class HomePage extends StatelessWidget {
                     MaterialPageRoute(builder: (_) => NotifikasiPage()),
                   );
                 },
-                child: Image.asset(
-                  "img/icon_notifikasi.png",
-                  width: 45,
-                ),
+                child: Image.asset("img/icon_notifikasi.png", width: 45),
               ),
             ),
           ),
@@ -94,7 +140,7 @@ class HomePage extends StatelessWidget {
               color: Color(0xFF6AAE2F),
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              fontStyle: FontStyle.italic
+              fontStyle: FontStyle.italic,
             ),
           ),
 
@@ -104,7 +150,6 @@ class HomePage extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-
               // MENEBak GAMBAR
               _gameCard(
                 context: context,
@@ -113,9 +158,7 @@ class HomePage extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => MenebakGambarPage(),
-                    ),
+                    MaterialPageRoute(builder: (_) => MenebakGambarPage()),
                   );
                 },
               ),
@@ -128,9 +171,7 @@ class HomePage extends StatelessWidget {
                 onTap: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(
-                      builder: (_) => CocokkanPage(),
-                    ),
+                    MaterialPageRoute(builder: (_) => CocokkanPage()),
                   );
                 },
               ),
@@ -146,14 +187,11 @@ class HomePage extends StatelessWidget {
           height: 70,
           decoration: const BoxDecoration(
             color: Color(0xFF3E7B27),
-            borderRadius: BorderRadius.vertical(
-              top: Radius.circular(30),
-            ),
+            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-
               GestureDetector(
                 onTap: () {
                   Navigator.push(

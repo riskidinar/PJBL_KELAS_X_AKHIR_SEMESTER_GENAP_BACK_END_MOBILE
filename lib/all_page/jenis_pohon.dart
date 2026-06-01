@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter/material.dart';
-import 'selesai_mencocokkan.dart';
+import 'selesai_mencocokkan.dart'; 
 import 'setting.dart';
 import 'homepage.dart';
 import 'profil.dart';
@@ -14,6 +15,10 @@ class MencocokkanPohonPage extends StatefulWidget {
 }
 
 class _MencocokkanPohonPageState extends State<MencocokkanPohonPage> {
+
+  // stopwatch
+  late Stopwatch stopwatch;
+
   final List<String> correctOrder = ["Angsana", "Merbau", "Kenari"];
   late List<String> draggableItems;
 
@@ -23,15 +28,15 @@ class _MencocokkanPohonPageState extends State<MencocokkanPohonPage> {
   @override
   void initState() {
     super.initState();
+    stopwatch = Stopwatch();
+    stopwatch.start();
     startGame();
   }
 
   void startGame() {
     draggableItems = List.from(correctOrder);
     draggableItems.shuffle(Random());
-
     placed = {"Angsana": null, "Merbau": null, "Kenari": null};
-
     wrongTarget = null;
   }
 
@@ -39,12 +44,14 @@ class _MencocokkanPohonPageState extends State<MencocokkanPohonPage> {
     return placed.values.every((e) => e != null);
   }
 
-  void checkFinish() {
+  void checkFinish() { 
     if (isFinished()) {
+      stopwatch.stop();
+      int finalScore = calculateScore();
       Future.delayed(const Duration(milliseconds: 500), () {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (_) => GameSelesaiPage()),
+          MaterialPageRoute(builder: (_) => GameSelesaiPage(score: finalScore,)),
         );
       });
     }
@@ -60,6 +67,45 @@ class _MencocokkanPohonPageState extends State<MencocokkanPohonPage> {
         wrongTarget = null;
       });
     });
+  }
+
+  int calculateScore() {
+    final seconds = stopwatch.elapsed.inSeconds;
+
+    if (seconds <= 10) {
+      return 100;
+    } else if (seconds <= 20) {
+      return 80;
+    } else if (seconds <= 30) {
+      return 60;
+    } else {
+      return 40;
+    }
+  }
+
+  final supabase = Supabase.instance.client;
+
+  Future<void> saveScore(int score) async {
+    try {
+      final user = supabase.auth.currentUser;
+      if (user == null) return;
+
+      // ambil skor lama
+      final data = await supabase
+          .from('profiles')
+          .select('total_score')
+          .eq('id', user.id)
+          .single();
+      int currentScore = data['total_score'] ?? 0;
+
+      // update skor baru
+      await supabase
+          .from('profiles')
+          .update({'total_score': currentScore + score})
+          .eq('id', user.id);
+    } catch (e) {
+      debugPrint(e.toString());
+    }
   }
 
   @override
@@ -184,7 +230,7 @@ class _MencocokkanPohonPageState extends State<MencocokkanPohonPage> {
                           draggableItems.remove(data);
                         });
 
-                        checkFinish();
+                        checkFinish(); 
                       } else {
                         showWrongEffect(targetName);
                       }

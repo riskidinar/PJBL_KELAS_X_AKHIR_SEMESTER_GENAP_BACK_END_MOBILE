@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -19,6 +21,7 @@ class _ProfilPageState extends State<ProfilPage> {
   final emailController = TextEditingController();
 
   File? imageFile;
+  Uint8List? webImage;
   String? avatarUrl;
   int totalScore = 0;
   bool isLoading = true;
@@ -54,12 +57,26 @@ class _ProfilPageState extends State<ProfilPage> {
 
   // PILIH FOTO
   Future<void> pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      setState(() {
-        imageFile = File(pickedFile.path);
-      });
+    try {
+      final picker = ImagePicker();
+
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile == null) return;
+
+      if (kIsWeb) {
+        final bytes = await pickedFile.readAsBytes();
+
+        setState(() {
+          webImage = bytes;
+        });
+      } else {
+        setState(() {
+          imageFile = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      debugPrint("ERROR PICK IMAGE: $e");
     }
   }
 
@@ -67,13 +84,32 @@ class _ProfilPageState extends State<ProfilPage> {
   Future<String?> uploadImage() async {
     try {
       final user = supabase.auth.currentUser;
-      if (user == null || imageFile == null) return null;
+
+      if (user == null) return null;
+
       final fileName = "${DateTime.now().millisecondsSinceEpoch}.png";
-      await supabase.storage.from('avatars').upload(fileName, imageFile!);
+
+      if (kIsWeb) {
+        if (webImage == null) return null;
+
+        await supabase.storage
+            .from('avatars')
+            .uploadBinary(fileName, webImage!);
+      } else {
+        if (imageFile == null) return null;
+
+        await supabase.storage.from('avatars').upload(fileName, imageFile!);
+      }
+
       final imageUrl = supabase.storage.from('avatars').getPublicUrl(fileName);
+
       return imageUrl;
     } catch (e) {
-      debugPrint(e.toString());
+      debugPrint("UPLOAD ERROR: $e");
+      debugPrint("WEB: $kIsWeb");
+      debugPrint("WEB IMAGE NULL: ${webImage == null}");
+      debugPrint("IMAGE FILE NULL: ${imageFile == null}");
+      debugPrint("UPLOAD BERHASIL");
       return null;
     }
   }
@@ -82,16 +118,17 @@ class _ProfilPageState extends State<ProfilPage> {
   Future<void> saveProfile() async {
     try {
       final user = supabase.auth.currentUser;
+
       if (user == null) return;
+
       final usernameBaru = usernameController.text.trim();
 
-      // CEK USERNAME SUDAH ADA ATAU BELUM
+      // cek username
       final checkUsername = await supabase.rpc(
         'check_username_exists',
         params: {'username_input': usernameBaru},
       );
 
-      // AMBIL USERNAME LAMA
       final currentData = await supabase
           .from('profiles')
           .select('username')
@@ -100,24 +137,21 @@ class _ProfilPageState extends State<ProfilPage> {
 
       final usernameLama = currentData['username'];
 
-      // JIKA USERNAME SUDAH DIPAKAI USER LAIN
       if (checkUsername == true &&
           usernameBaru.toLowerCase() != usernameLama.toLowerCase()) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Username sudah digunakan")),
         );
-
         return;
       }
 
       String? imageUrl = avatarUrl;
 
-      // JIKA ADA FOTO BARU
-      if (imageFile != null) {
+      // upload foto baru
+      if (imageFile != null || webImage != null) {
         imageUrl = await uploadImage();
       }
 
-      // UPDATE DATABASE
       await supabase
           .from('profiles')
           .update({
@@ -131,9 +165,9 @@ class _ProfilPageState extends State<ProfilPage> {
         const SnackBar(content: Text("Profile berhasil diupdate")),
       );
 
-      getProfile();
+      await getProfile();
     } catch (e) {
-      debugPrint(e.toString());
+      debugPrint("SAVE PROFILE ERROR: $e");
     }
   }
 
@@ -159,7 +193,6 @@ class _ProfilPageState extends State<ProfilPage> {
         child: Column(
           children: [
             // HEADER
-            
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
@@ -177,12 +210,19 @@ class _ProfilPageState extends State<ProfilPage> {
               onTap: pickImage,
               child: CircleAvatar(
                 radius: 70,
-                backgroundImage: imageFile != null
-                    ? FileImage(imageFile!)
-                    : avatarUrl != null
-                    ? NetworkImage(avatarUrl!)
-                    : const AssetImage("img/profile_online.png")
-                          as ImageProvider,
+                backgroundImage: kIsWeb
+                    ? (webImage != null
+                          ? MemoryImage(webImage!)
+                          : (avatarUrl != null
+                                ? NetworkImage(avatarUrl!)
+                                : const AssetImage("img/profile_online.png")
+                                      as ImageProvider))
+                    : (imageFile != null
+                          ? FileImage(imageFile!)
+                          : (avatarUrl != null
+                                ? NetworkImage(avatarUrl!)
+                                : const AssetImage("img/profile_online.png")
+                                      as ImageProvider)),
               ),
             ),
 
@@ -228,7 +268,6 @@ class _ProfilPageState extends State<ProfilPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-
                   const SizedBox(height: 10),
 
                   const Padding(
@@ -326,6 +365,7 @@ class _ProfilPageState extends State<ProfilPage> {
               ),
             ),
             const Spacer(),
+
             // LOGOUT
             GestureDetector(
               onTap: signOut,
